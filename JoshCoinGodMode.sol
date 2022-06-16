@@ -38,6 +38,8 @@ contract JoshCoinGodMode is JoshCoin {
     /**
      * @dev Mints `amount` tokens to any `recipient` address.
      *
+     * Emits a {Transfer} event.
+     *
      * Requirements:
      *
      * - `onlyOwner` modifier.

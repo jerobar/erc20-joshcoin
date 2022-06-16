@@ -74,7 +74,9 @@ contract JoshCoinSanctions is JoshCoin {
 
     /**
      * @dev Transfers `value` amount of tokens from `msg.sender` address to address
-     * `to`, emits a {Transfer} event and returns true.
+     * `to`.
+     *
+     * Emits a {Transfer} event and returns true.
      *
      * Requirements:
      *
@@ -97,8 +99,9 @@ contract JoshCoinSanctions is JoshCoin {
     }
 
     /**
-     * @dev Transfers `value` amount of tokens from address `from` to address `to`,
-     * emits a {Transfer} event and returns true.
+     * @dev Transfers `value` amount of tokens from address `from` to address `to`.
+     *
+     * Emits a {Transfer} event and returns true.
      *
      * Requirements:
      *

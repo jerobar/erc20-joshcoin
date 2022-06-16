@@ -25,6 +25,8 @@ contract JoshCoinTokensale is JoshCoin {
      * to the caller's address. Function also requires the total supply of tokens
      * will not exceed 1,000,000.
      *
+     * Emits a {Transfer} event.
+     *
      * Requirements:
      *
      * - Function called with 1 ether.

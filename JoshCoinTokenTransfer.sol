@@ -45,6 +45,8 @@ contract JoshCoinTokenTransfer is JoshCoinTokensale {
      * purchase tokens held by contract at a price of 1 ether per 1,000 if
      * token sale has ended.
      *
+     * May emit a {Transfer} event.
+     *
      * Requirements:
      *
      * - Function called with 1 ether.

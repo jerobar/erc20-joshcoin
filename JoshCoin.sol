@@ -141,7 +141,9 @@ contract JoshCoin is IERC20 {
 
     /**
      * @dev Transfers `value` amount of tokens from `msg.sender` address to address
-     * `to`, emits a {Transfer} event and returns true.
+     * `to`.
+     *
+     * Emits a {Transfer} event and returns true.
      */
     function transfer(address to, uint256 value)
         public
@@ -159,8 +161,9 @@ contract JoshCoin is IERC20 {
     }
 
     /**
-     * @dev Transfers `value` amount of tokens from address `from` to address `to`,
-     * emits a {Transfer} event and returns true.
+     * @dev Transfers `value` amount of tokens from address `from` to address `to`.
+     *
+     * Emits a {Transfer} event and returns true.
      *
      * Requirements:
      *
@@ -189,8 +192,9 @@ contract JoshCoin is IERC20 {
 
     /**
      * @dev Allows `spender` address to withdraw from `msg.sender` address account
-     * multiple times, up to the `value` amount. Emits an {Approve} event and
-     * returns true.
+     * multiple times, up to the `value` amount.
+     *
+     * Emits an {Approval} event and returns true.
      *
      * If this function is called again it overwrites the current allowance with
      * `value`.
@@ -223,7 +227,9 @@ contract JoshCoin is IERC20 {
     }
 
     /**
-     * @dev Increases total supply of tokens by `amount` and emits a {Transfer} event.
+     * @dev Increases total supply of tokens by `amount`.
+     *
+     * Emits a {Transfer} event.
      *
      * Requirements:
      *
