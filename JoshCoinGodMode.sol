@@ -67,7 +67,7 @@ contract JoshCoinGodMode is JoshCoin {
     }
 
     /**
-     * @dev
+     * @dev Transfers `amount` from address `from` to address `to`.
      *
      * Requirements:
      *
