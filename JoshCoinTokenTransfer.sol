@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-// Import standard 'JoshCoin' implementation
+// Import 'JoshCoinTokensale' implementation of 'JoshCoin'
 import "./JoshCoinTokensale.sol";
 
 /**
