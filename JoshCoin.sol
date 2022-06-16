@@ -41,15 +41,15 @@ interface IERC20 {
  * @dev Implementation of the ERC20 Token Standard for 'JoshCoin'.
  */
 contract JoshCoin is IERC20 {
-    uint256 private _totalSupply;
-    mapping(address => uint256) private _balances;
-    mapping(address => mapping(address => uint256)) private _allowances;
+    uint256 internal _totalSupply;
+    mapping(address => uint256) internal _balances;
+    mapping(address => mapping(address => uint256)) internal _allowances;
 
     string private _name;
     string private _symbol;
     uint8 private _decimals;
 
-    address private _owner;
+    address internal _owner;
 
     /**
      * @dev Sets values for {_name}, {_symbol}, {_decimals}, and {_owner}.
@@ -60,6 +60,42 @@ contract JoshCoin is IERC20 {
         _decimals = 18;
 
         _owner = msg.sender;
+    }
+
+    /**
+     * @dev Requires `account` balance is >= `value`.
+     */
+    modifier sufficientBalance(address account, uint256 value) virtual {
+        require(
+            _balances[account] >= value,
+            "JoshCoin: insufficient token balance"
+        );
+        _;
+    }
+
+    /**
+     * @dev Requires `sender` address has suffient allowance to transfer `value`
+     * from `account` address.
+     */
+    modifier sufficientAllowance(
+        address account,
+        address sender,
+        uint256 value
+    ) virtual {
+        uint256 senderAllowance = allowance(account, sender);
+        require(senderAllowance >= value, "JoshCoin: insufficient allowance");
+        _;
+    }
+
+    /**
+     * @dev Requires `msg.sender` is contract `_owner`.
+     */
+    modifier onlyOwner() virtual {
+        require(
+            msg.sender == _owner,
+            "JoshCoin: Feature only available to contract owner"
+        );
+        _;
     }
 
     /**
@@ -111,13 +147,9 @@ contract JoshCoin is IERC20 {
         public
         virtual
         override
+        sufficientBalance(msg.sender, value)
         returns (bool)
     {
-        require(
-            _balances[msg.sender] >= value,
-            "JoshCoin: insufficient token balance"
-        );
-
         _balances[msg.sender] -= value;
         _balances[to] += value;
 
@@ -139,15 +171,14 @@ contract JoshCoin is IERC20 {
         address from,
         address to,
         uint256 value
-    ) public virtual override returns (bool) {
-        uint256 senderAllowance = allowance(from, msg.sender);
-        require(senderAllowance >= value, "JoshCoin: insufficient allowance");
-
-        require(
-            _balances[from] >= value,
-            "JoshCoin: insufficient token balance"
-        );
-
+    )
+        public
+        virtual
+        override
+        sufficientAllowance(from, to, value)
+        sufficientBalance(from, value)
+        returns (bool)
+    {
         _balances[from] -= value;
         _balances[to] += value;
 
@@ -196,11 +227,9 @@ contract JoshCoin is IERC20 {
      *
      * Requirements:
      *
-     * - Called by contract `_owner` address.
+     * - `onlyOwner` modifier.
      */
-    function mint(uint amount) public virtual {
-        require(msg.sender == _owner, "JoshCoin: Only owner may mint tokens");
-
+    function mint(uint amount) public virtual onlyOwner {
         _balances[msg.sender] += amount;
         _totalSupply += amount;
 
