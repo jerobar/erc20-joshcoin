@@ -24,8 +24,13 @@ contract JoshCoinTokensale is JoshCoin {
      * @dev Receive fallback function, if called with 1 ether, mints 1,000 tokens
      * to the caller's address. Function also requires the total supply of tokens
      * will not exceed 1,000,000.
+     *
+     * Requirements:
+     *
+     * - Function called with 1 ether.
+     * - < 1,000,000 tokens have been minted.
      */
-    receive() external payable {
+    receive() external payable virtual {
         uint256 amount = 10**18 * 1_000;
 
         require(
