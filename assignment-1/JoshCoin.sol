@@ -6,32 +6,26 @@ pragma solidity ^0.8.0;
  * @dev Interface of the ERC20 Token Standard.
  */
 interface IERC20 {
-    function name() public view returns (string);
+    function totalSupply() external view returns (uint256);
 
-    function symbol() public view returns (string);
-
-    function decimals() public view returns (uint8);
-
-    function totalSupply() public view returns (uint256);
-
-    function balanceOf(address _owner) public view returns (uint256 balance);
+    function balanceOf(address _owner) external view returns (uint256 balance);
 
     function transfer(address _to, uint256 _value)
-        public
+        external
         returns (bool success);
 
     function transferFrom(
         address _from,
         address _to,
         uint256 _value
-    ) public returns (bool success);
+    ) external returns (bool success);
 
     function approve(address _spender, uint256 _value)
-        public
+        external
         returns (bool success);
 
     function allowance(address _owner, address _spender)
-        public
+        external
         view
         returns (uint256 remaining);
 
@@ -47,138 +41,151 @@ interface IERC20 {
  * @dev Implementation of the ERC20 Token Standard for 'JoshCoin'.
  */
 contract JoshCoin is IERC20 {
-    uint256 private totalSupply;
-    mapping(address => uint256) private balances;
-    mapping(address => mapping(address => uint256)) private allowances;
+    uint256 private _totalSupply;
+    mapping(address => uint256) private _balances;
+    mapping(address => mapping(address => uint256)) private _allowances;
 
-    string private name;
-    string private symbol;
-    uint8 private decimals;
+    string private _name;
+    string private _symbol;
+    uint8 private _decimals;
 
-    address private owner;
+    address private _owner;
 
     /**
      * @dev Sets values for {name}, {symbol}, {decimals}, and {owner}.
      */
     constructor() {
-        name = "JoshCoin";
-        symbol = "JOSH";
-        decimals = 18;
+        _name = "JoshCoin";
+        _symbol = "JOSH";
+        _decimals = 18;
 
-        owner = msg.sender;
+        _owner = msg.sender;
     }
 
     /**
      * @dev Returns the token name.
      */
-    function name() public view returns (string memory) {
-        return name;
+    function name() public view virtual returns (string memory) {
+        return _name;
     }
 
     /**
      * @dev Returns the token symbol.
      */
-    function symbol() public view returns (string memory) {
-        return symbol;
+    function symbol() public view virtual returns (string memory) {
+        return _symbol;
     }
 
     /**
      * @dev Returns the number of decimals used when representing token values.
      */
-    function decimals() public view returns (uint8) {
-        return decimals;
+    function decimals() public view virtual returns (uint8) {
+        return _decimals;
     }
 
     /**
      * @dev Returns the total token supply.
      */
-    function totalSupply() public view returns (uint) {
-        return totalSupply;
+    function totalSupply() public view virtual override returns (uint) {
+        return _totalSupply;
     }
 
     /**
      * @dev Returns the token balance of the provided address.
      */
-    function balanceOf(address _owner) public view returns (uint256) {
-        return balances[_owner];
+    function balanceOf(address owner)
+        public
+        view
+        virtual
+        override
+        returns (uint256)
+    {
+        return _balances[owner];
     }
 
     /**
-     * @dev Transfers {_value} amount of tokens to address {_to} and emits a {Transfer} event.
+     * @dev Transfers {value} amount of tokens to address {to} and emits a {Transfer} event.
      */
-    function transfer(address _to, uint256 _value) public returns (bool) {
+    function transfer(address to, uint256 value)
+        public
+        virtual
+        override
+        returns (bool)
+    {
         require(
-            balances[msg.sender] >= _value,
+            _balances[msg.sender] >= value,
             "ERC20: insufficient token balance"
         );
 
-        balances[msg.sender] -= _value;
-        balances[_to] += _value;
+        _balances[msg.sender] -= value;
+        _balances[to] += value;
 
-        emit Transfer(msg.sender, _to, _value);
+        emit Transfer(msg.sender, to, value);
 
         return true;
     }
 
     /**
-     * @dev Transfers {_value} amount of tokens from address {_from} to address {_to} and emits a {Transfer} event.
+     * @dev Transfers {_value} amount of tokens from address {from} to address {to} and emits a {Transfer} event.
      */
     function transferFrom(
-        address _from,
-        address _to,
-        uint256 _value
-    ) public returns (bool) {
-        uint256 senderAllowance = allowance(_from, msg.sender);
-        require(senderAllowance >= _value, "ERC20: insufficient allowance")
+        address from,
+        address to,
+        uint256 value
+    ) public virtual override returns (bool) {
+        uint256 senderAllowance = allowance(from, msg.sender);
+        require(senderAllowance >= value, "ERC20: insufficient allowance");
 
-        require(balances[_from] >= _value, "ERC20: insufficient token balance");
+        require(_balances[from] >= value, "ERC20: insufficient token balance");
 
-        balances[_from] -= _value;
-        balances[_to] += _value;
+        _balances[from] -= value;
+        _balances[to] += value;
 
-        emit Transfer(_from, _to, value);
+        emit Transfer(from, to, value);
 
         return true;
     }
 
     /**
-     * @dev Allows {_spender} to withdraw from msg.sender's account multiple times, up to the {_value} amount.
-     * If this function is called again it overwrites the current allowance with {_value}. Emits an {Approve} 
+     * @dev Allows {spender} to withdraw from msg.sender's account multiple times, up to the {value} amount.
+     * If this function is called again it overwrites the current allowance with {value}. Emits an {Approve}
      * event and returns true.
      */
-    function approve(address _spender, uint256 _value)
+    function approve(address spender, uint256 value)
         public
+        virtual
+        override
         returns (bool success)
     {
-        allowances[msg.sender][_spender] = _value;
+        _allowances[msg.sender][spender] = value;
 
-        emit Approve(msg.sender, _spender, _value);
+        emit Approval(msg.sender, spender, value);
 
         return true;
     }
 
     /**
-     * @dev Returns the remaining amount {_spender} is allowed to withdraw from {_owner}.
+     * @dev Returns the remaining amount {spender} is allowed to withdraw from {owner}.
      */
-    function allowance(address _owner, address _spender)
+    function allowance(address owner, address spender)
         public
         view
+        virtual
+        override
         returns (uint256 remaining)
     {
-        return allowances[_owner][_spender];
+        return _allowances[owner][spender];
     }
 
-    // function mint(uint amount) external { // not part of ERC20 standard
-    //     balanceOf[msg.sender] += amount;
-    //     totalSupply += amount;
+    /**
+     * @dev Increases total supply of tokens by {amount} and emits {Transfer} event.
+     */
+    function mint(uint amount) public virtual {
+        require(msg.sender == _owner, "Only owner may mint tokens");
 
-    //     emit Transfer(address(0), msg.sender, amount);
-    // }
+        _balances[msg.sender] += amount;
+        _totalSupply += amount;
 
-    // function burn(uint amount) external { // not part of ERC20 standard
-    //     balanceOf[msg.sender] -= amount;
-    //     totalSupply -= amount;
-
-    //     emit Transfer(msg.sender, address(0), amount);
-    // }
+        emit Transfer(address(0), msg.sender, amount);
+    }
 }
