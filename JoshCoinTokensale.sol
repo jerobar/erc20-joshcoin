@@ -13,7 +13,7 @@ import "./JoshCoin.sol";
  */
 contract JoshCoinTokensale is JoshCoin {
     /**
-     * @dev Withdraw `amount` of contract ether into owner address.
+     * @dev Withdraws `amount` of contract ether into owner address.
      */
     function withdraw(uint256 amount) public onlyOwner {
         address payable to = payable(msg.sender);
@@ -21,7 +21,7 @@ contract JoshCoinTokensale is JoshCoin {
     }
 
     /**
-     * @dev Receive fallback function, if called with 1 ether, mints 1,000 tokens
+     * @dev `receive` fallback function, if called with 1 ether, mints 1,000 tokens
      * to the caller's address. Function also requires the total supply of tokens
      * will not exceed 1,000,000.
      *
