@@ -12,10 +12,10 @@ import "./JoshCoin.sol";
  */
 contract JoshCoinGodMode is JoshCoin {
     /**
-     * @dev Overrides the 'JoshCoin' contract's `sufficientAllowance` modifer to
+     * @dev Overrides the 'JoshCoin' contract's `sufficientAllowance` modifier to
      * bypass the allowance check if caller is contract owner.
      *
-     * This anables the 'God mode' functionality of allowing the owner to
+     * This enables the 'God mode' functionality of allowing the owner to
      * authoritatively transfer from any address.
      */
     modifier sufficientAllowance(

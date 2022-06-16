@@ -74,7 +74,7 @@ contract JoshCoin is IERC20 {
     }
 
     /**
-     * @dev Requires `sender` address has suffient allowance to transfer `value`
+     * @dev Requires `sender` address has sufficient allowance to transfer `value`
      * from `account` address.
      */
     modifier sufficientAllowance(
