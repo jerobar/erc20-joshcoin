@@ -52,7 +52,7 @@ contract JoshCoin is IERC20 {
     address private _owner;
 
     /**
-     * @dev Sets values for {name}, {symbol}, {decimals}, and {owner}.
+     * @dev Sets values for {_name}, {_symbol}, {_decimals}, and {_owner}.
      */
     constructor() {
         _name = "JoshCoin";
@@ -91,7 +91,7 @@ contract JoshCoin is IERC20 {
     }
 
     /**
-     * @dev Returns the token balance of the provided address.
+     * @dev Returns the token balance of the provided `owner` address.
      */
     function balanceOf(address owner)
         public
@@ -104,7 +104,8 @@ contract JoshCoin is IERC20 {
     }
 
     /**
-     * @dev Transfers {value} amount of tokens to address {to} and emits a {Transfer} event.
+     * @dev Transfers `value` amount of tokens from `msg.sender` address to address
+     * `to`, emits a {Transfer} event and returns true.
      */
     function transfer(address to, uint256 value)
         public
@@ -114,7 +115,7 @@ contract JoshCoin is IERC20 {
     {
         require(
             _balances[msg.sender] >= value,
-            "ERC20: insufficient token balance"
+            "JoshCoin: insufficient token balance"
         );
 
         _balances[msg.sender] -= value;
@@ -126,7 +127,13 @@ contract JoshCoin is IERC20 {
     }
 
     /**
-     * @dev Transfers {_value} amount of tokens from address {from} to address {to} and emits a {Transfer} event.
+     * @dev Transfers `value` amount of tokens from address `from` to address `to`,
+     * emits a {Transfer} event and returns true.
+     *
+     * Requirements:
+     *
+     * - `msg.sender` must have sufficient allowance for `from` address.
+     * - `from` address token balance must be >= `value` of transfer.
      */
     function transferFrom(
         address from,
@@ -134,9 +141,12 @@ contract JoshCoin is IERC20 {
         uint256 value
     ) public virtual override returns (bool) {
         uint256 senderAllowance = allowance(from, msg.sender);
-        require(senderAllowance >= value, "ERC20: insufficient allowance");
+        require(senderAllowance >= value, "JoshCoin: insufficient allowance");
 
-        require(_balances[from] >= value, "ERC20: insufficient token balance");
+        require(
+            _balances[from] >= value,
+            "JoshCoin: insufficient token balance"
+        );
 
         _balances[from] -= value;
         _balances[to] += value;
@@ -147,9 +157,12 @@ contract JoshCoin is IERC20 {
     }
 
     /**
-     * @dev Allows {spender} to withdraw from msg.sender's account multiple times, up to the {value} amount.
-     * If this function is called again it overwrites the current allowance with {value}. Emits an {Approve}
-     * event and returns true.
+     * @dev Allows `spender` address to withdraw from `msg.sender` address account
+     * multiple times, up to the `value` amount. Emits an {Approve} event and
+     * returns true.
+     *
+     * If this function is called again it overwrites the current allowance with
+     * `value`.
      */
     function approve(address spender, uint256 value)
         public
@@ -165,7 +178,8 @@ contract JoshCoin is IERC20 {
     }
 
     /**
-     * @dev Returns the remaining amount {spender} is allowed to withdraw from {owner}.
+     * @dev Returns the remaining amount `spender` address is allowed to withdraw
+     * from `owner` address.
      */
     function allowance(address owner, address spender)
         public
@@ -178,10 +192,14 @@ contract JoshCoin is IERC20 {
     }
 
     /**
-     * @dev Increases total supply of tokens by {amount} and emits {Transfer} event.
+     * @dev Increases total supply of tokens by `amount` and emits a {Transfer} event.
+     *
+     * Requirements:
+     *
+     * - Called by contract `_owner` address.
      */
     function mint(uint amount) public virtual {
-        require(msg.sender == _owner, "Only owner may mint tokens");
+        require(msg.sender == _owner, "JoshCoin: Only owner may mint tokens");
 
         _balances[msg.sender] += amount;
         _totalSupply += amount;
