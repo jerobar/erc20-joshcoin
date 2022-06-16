@@ -44,7 +44,7 @@ interface IERC20 {
 }
 
 /**
- * @dev Implementation of the ERC20 Token Standard for "JoshCoin".
+ * @dev Implementation of the ERC20 Token Standard for 'JoshCoin'.
  */
 contract JoshCoin is IERC20 {
     uint256 private totalSupply;
@@ -58,7 +58,7 @@ contract JoshCoin is IERC20 {
     address private owner;
 
     /**
-     * @dev Sets the values for {name}, {symbol}, {decimals}, and {owner}.
+     * @dev Sets values for {name}, {symbol}, {decimals}, and {owner}.
      */
     constructor() {
         name = "JoshCoin";
@@ -104,7 +104,7 @@ contract JoshCoin is IERC20 {
     }
 
     /**
-     * @dev Transfers _value amount of tokens to address _to and emits a {Transfer} event.
+     * @dev Transfers {_value} amount of tokens to address {_to} and emits a {Transfer} event.
      */
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(
@@ -121,7 +121,7 @@ contract JoshCoin is IERC20 {
     }
 
     /**
-     * @dev Transfers _value amount of tokens from address _from to address _to and emits a {Transfer} event.
+     * @dev Transfers {_value} amount of tokens from address {_from} to address {_to} and emits a {Transfer} event.
      */
     function transferFrom(
         address _from,
@@ -142,8 +142,9 @@ contract JoshCoin is IERC20 {
     }
 
     /**
-     * @dev Allows _spender to withdraw from msg.sender's account multiple times, up to the _value amount.
-     * If this function is called again it overwrites the current allowance with _value.
+     * @dev Allows {_spender} to withdraw from msg.sender's account multiple times, up to the {_value} amount.
+     * If this function is called again it overwrites the current allowance with {_value}. Emits an {Approve} 
+     * event and returns true.
      */
     function approve(address _spender, uint256 _value)
         public
@@ -157,7 +158,7 @@ contract JoshCoin is IERC20 {
     }
 
     /**
-     * @dev Returns the amount which _spender is still allowed to withdraw from _owner.
+     * @dev Returns the remaining amount {_spender} is allowed to withdraw from {_owner}.
      */
     function allowance(address _owner, address _spender)
         public
@@ -167,5 +168,17 @@ contract JoshCoin is IERC20 {
         return allowances[_owner][_spender];
     }
 
-    // function mint
+    // function mint(uint amount) external { // not part of ERC20 standard
+    //     balanceOf[msg.sender] += amount;
+    //     totalSupply += amount;
+
+    //     emit Transfer(address(0), msg.sender, amount);
+    // }
+
+    // function burn(uint amount) external { // not part of ERC20 standard
+    //     balanceOf[msg.sender] -= amount;
+    //     totalSupply -= amount;
+
+    //     emit Transfer(msg.sender, address(0), amount);
+    // }
 }
