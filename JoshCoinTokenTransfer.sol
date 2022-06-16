@@ -48,7 +48,7 @@ contract JoshCoinTokenTransfer is JoshCoinTokensale {
      * Requirements:
      *
      * - Function called with 1 ether.
-     * -
+     * - If tokens can't be minted, contract must hold >= 1,000 tokens
      */
     receive() external payable override {
         uint256 amount = 10**18 * 1_000;
