@@ -10,7 +10,7 @@ import "./JoshCoinTokensale.sol";
  */
 contract JoshCoinTokenTransfer is JoshCoinTokensale {
     /**
-     * @dev
+     * @dev Allows users to sell 1,000 of their tokens for 0.5 ether.
      *
      * Requirements:
      *
