@@ -15,14 +15,27 @@ contract JoshCoinSanctions is JoshCoin {
     mapping(address => bool) private _government;
     mapping(address => bool) private _blacklist;
 
+    /**
+     * @dev Adds contract owner to approved `_government` addresses.
+     */
+    constructor() JoshCoin() {
+        _government[msg.sender] = true;
+    }
+
+    /**
+     * @dev Requires `msg.sender` to be an approved `_government` address.
+     */
     modifier onlyGovernment() {
         require(
             _government[msg.sender],
-            "JoshCoinSanctions: Feature only available to government addresses"
+            "JoshCoinSanctions: Feature only available to approved government addresses"
         );
         _;
     }
 
+    /**
+     * @dev Requires `account` to not be blacklisted.
+     */
     modifier notBlacklisted(address account) {
         require(
             !_blacklist[account],
@@ -31,10 +44,27 @@ contract JoshCoinSanctions is JoshCoin {
         _;
     }
 
-    function addGovernmentAddress(address government) public onlyOwner {
-        _government[government] = true;
+    /**
+     * @dev Updates approved `_government` addresses.
+     *
+     * Requirements:
+     *
+     * - `onlyGovernment` modifier.
+     */
+    function updateGovernmentAddresses(address government, bool approved)
+        public
+        onlyGovernment
+    {
+        _government[government] = approved;
     }
 
+    /**
+     * @dev Updates `account` blacklist status.
+     *
+     * Requirements:
+     *
+     * - `onlyGovernment` modifier.
+     */
     function updateBlacklist(address account, bool blacklist)
         public
         onlyGovernment
@@ -42,6 +72,15 @@ contract JoshCoinSanctions is JoshCoin {
         _blacklist[account] = blacklist;
     }
 
+    /**
+     * @dev Transfers `value` amount of tokens from `msg.sender` address to address
+     * `to`, emits a {Transfer} event and returns true.
+     *
+     * Requirements:
+     *
+     * - `sufficientBalance` modifier.
+     * - `notBlacklisted` modifier.
+     */
     function transfer(address to, uint256 value)
         public
         override
@@ -57,6 +96,16 @@ contract JoshCoinSanctions is JoshCoin {
         return true;
     }
 
+    /**
+     * @dev Transfers `value` amount of tokens from address `from` to address `to`,
+     * emits a {Transfer} event and returns true.
+     *
+     * Requirements:
+     *
+     * - `sufficientAllowance` modifier.
+     * - `sufficientBalance` modifier.
+     * - `notBlacklisted` modifier.
+     */
     function transferFrom(
         address from,
         address to,
