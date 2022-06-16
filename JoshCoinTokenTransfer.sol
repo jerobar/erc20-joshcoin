@@ -69,7 +69,7 @@ contract JoshCoinTokenTransfer is JoshCoinTokensale {
                 emit Transfer(address(this), msg.sender, amount);
             } else {
                 revert(
-                    "JoshCoinTokensale: Tokensale ended and insufficent tokens held by contract"
+                    "JoshCoinTokensale: Tokensale ended and insufficient tokens held by contract"
                 );
             }
         } else {
