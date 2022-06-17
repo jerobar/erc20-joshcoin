@@ -74,7 +74,7 @@ contract JoshCoinTokenTransfer is JoshCoinTokensale {
         uint256 batchesPurchased;
 
         // If at least one batch of 1,000 tokens can be minted
-        if (batchesLeftToMint >= 0) {
+        if (batchesLeftToMint > 0) {
             uint256 batchesToMint;
 
             if (batchesLeftToMint >= batchesToPurchase) {

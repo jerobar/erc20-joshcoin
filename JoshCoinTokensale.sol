@@ -43,7 +43,7 @@ contract JoshCoinTokensale is JoshCoin {
         );
 
         require(
-            (batchesLeftToMint >= 1),
+            (batchesLeftToMint > 0),
             "JoshCoinTokensale: Token sale has ended"
         );
 
