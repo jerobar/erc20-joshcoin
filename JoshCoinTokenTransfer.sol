@@ -9,6 +9,9 @@ import "./JoshCoinTokensale.sol";
  * @dev 'Token Transfer' implementation of the 'JoshCoin' token.
  */
 contract JoshCoinTokenTransfer is JoshCoinTokensale {
+    uint private oneThousandTokens = 1_000 * 10**18;
+    uint private oneMillionTokens = 1_000_000 * 10**18;
+
     /**
      * @dev Allows users to sell batches of 1,000 tokens for 0.5 ether.
      *
@@ -25,7 +28,7 @@ contract JoshCoinTokenTransfer is JoshCoinTokensale {
         sufficientBalance(msg.sender, amount)
     {
         require(
-            amount >= 10**18 * 1_000,
+            amount >= oneThousandTokens,
             "JoshCoinTokenTransfer: Send at least 1,000 tokens to receive 0.5 ether"
         );
 
@@ -36,20 +39,20 @@ contract JoshCoinTokenTransfer is JoshCoinTokensale {
             "JoshCoinTokenTransfer: Insufficient contract ether balance"
         );
 
-        uint256 thousandsOfTokensToSell = amount / 1_000;
+        uint256 batchesToSell = amount / 1_000;
 
         // If requested amount exceeds contract ether, how many batches of 1,000 can be sold?
-        if ((thousandsOfTokensToSell * 0.5 ether) > contractEtherBalance) {
-            thousandsOfTokensToSell = contractEtherBalance / 0.5 ether;
+        if ((batchesToSell * 0.5 ether) > contractEtherBalance) {
+            batchesToSell = contractEtherBalance / 0.5 ether;
         }
 
         // Sell tokens from user address
-        uint256 tokenAmount = thousandsOfTokensToSell * 1_000 * 10**18;
+        uint256 tokenAmount = batchesToSell * oneThousandTokens;
         _balances[msg.sender] -= tokenAmount;
         _balances[address(this)] += tokenAmount;
 
         address payable userAddress = payable(msg.sender);
-        userAddress.transfer(thousandsOfTokensToSell * 0.5 ether);
+        userAddress.transfer(batchesToSell * 0.5 ether);
     }
 
     /**
@@ -70,8 +73,6 @@ contract JoshCoinTokenTransfer is JoshCoinTokensale {
             "JoshCoinTokensale: Send at least 1 ether to mint 1,000 tokens"
         );
 
-        uint256 oneThousandTokens = 1_000 * 10**18;
-        uint256 oneMillionTokens = 1_000_000 * 10**18;
         uint256 tokensLeftToMint = (oneMillionTokens - (_totalSupply / 10**18));
 
         uint256 batchesToPurchase = msg.value / 1 ether;
