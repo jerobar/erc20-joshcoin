@@ -55,7 +55,7 @@ contract JoshCoinTokenTransfer is JoshCoinTokensale {
     /**
      * @dev Overrides parent contract's `receive` function to allow users to
      * purchase batches of tokens held by contract at a price of 1 ether per 1,000 if
-     * token sale has ended.
+     * tokensale (minting) has ended.
      *
      * May emit a {Transfer} event.
      *
