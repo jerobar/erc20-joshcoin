@@ -10,14 +10,14 @@ import "./JoshCoinTokensale.sol";
  */
 contract JoshCoinTokenTransfer is JoshCoinTokensale {
     /**
-     * @dev Allows users to sell 1,000 of their tokens for 0.5 ether.
+     * @dev Allows users to sell batches of 1,000 tokens for 0.5 ether.
      *
      * Requirements:
      *
      * - `sufficientAllowance` modifier.
      * - `sufficientBalance` modifier.
-     * - Function called with `amount` of 1,000 tokens
-     * - Contract contains sufficient ether to pay `msg.sender`
+     * - Function called with `amount` of >= 1,000 tokens
+     * - Contract contains at least 0.5 ether to pay `msg.sender`
      */
     function sellTokens(uint256 amount)
         public
@@ -25,61 +25,120 @@ contract JoshCoinTokenTransfer is JoshCoinTokensale {
         sufficientBalance(msg.sender, amount)
     {
         require(
-            amount == 10**18 * 1_000,
-            "JoshCoinTokenTransfer: Send 1,000 tokens to receive 0.5 ether"
+            amount >= 10**18 * 1_000,
+            "JoshCoinTokenTransfer: Send at least 1,000 tokens to receive 0.5 ether"
         );
+
+        uint256 contractEtherBalance = address(this).balance;
+
         require(
-            address(this).balance >= 0.5 ether,
+            contractEtherBalance >= 0.5 ether,
             "JoshCoinTokenTransfer: Insufficient contract ether balance"
         );
 
-        _balances[address(this)] += amount;
-        _balances[msg.sender] -= amount;
+        uint256 thousandsOfTokensToSell = amount / 1_000;
 
-        address payable to = payable(msg.sender);
-        to.transfer(0.5 ether);
+        // If requested amount exceeds contract ether, how many batches of 1,000 can be sold?
+        if ((thousandsOfTokensToSell * 0.5 ether) > contractEtherBalance) {
+            thousandsOfTokensToSell = contractEtherBalance / 0.5 ether;
+        }
+
+        // Sell tokens from user address
+        uint256 tokenAmount = thousandsOfTokensToSell * 1_000 * 10**18;
+        _balances[msg.sender] -= tokenAmount;
+        _balances[address(this)] += tokenAmount;
+
+        address payable userAddress = payable(msg.sender);
+        userAddress.transfer(thousandsOfTokensToSell * 0.5 ether);
     }
 
     /**
      * @dev Overrides parent contract's `receive` function to allow users to
-     * purchase tokens held by contract at a price of 1 ether per 1,000 if
+     * purchase batches of tokens held by contract at a price of 1 ether per 1,000 if
      * token sale has ended.
      *
      * May emit a {Transfer} event.
      *
      * Requirements:
      *
-     * - Function called with 1 ether.
+     * - Function called with >= 1 ether.
      * - If tokens can't be minted, contract must hold >= 1,000 tokens
      */
     receive() external payable override {
-        uint256 amount = 10**18 * 1_000;
-
         require(
-            msg.value == 1 ether,
-            "JoshCoinTokensale: Send 1 ether to mint 1,000 tokens"
+            msg.value >= 1 ether,
+            "JoshCoinTokensale: Send at least 1 ether to mint 1,000 tokens"
         );
 
-        // If 1,000,000 tokens have already been minted
-        if (_totalSupply > (10**18 * 1_000_000) + amount) {
-            // If contract holds sufficient tokens
-            if (_balances[address(this)] >= amount) {
-                // Sell tokens held by contract
-                _balances[address(this)] -= amount;
-                _balances[msg.sender] += amount;
+        uint256 oneThousandTokens = 1_000 * 10**18;
+        uint256 oneMillionTokens = 1_000_000 * 10**18;
+        uint256 tokensLeftToMint = (oneMillionTokens - (_totalSupply / 10**18));
 
-                emit Transfer(address(this), msg.sender, amount);
+        uint256 batchesToPurchase = msg.value / 1 ether;
+        uint256 batchesPurchased;
+
+        // If at least one batch of 1,000 tokens can be minted
+        if (tokensLeftToMint >= oneThousandTokens) {
+            uint256 batchesLeftToMint = tokensLeftToMint / oneThousandTokens;
+            uint256 batchesToMint;
+
+            if (batchesLeftToMint >= batchesToPurchase) {
+                batchesToMint = batchesToPurchase;
             } else {
-                revert(
-                    "JoshCoinTokensale: Tokensale ended and insufficient tokens held by contract"
-                );
+                batchesToMint = batchesLeftToMint;
             }
-        } else {
-            // Mint tokens
-            _balances[msg.sender] += amount;
-            _totalSupply += amount;
 
-            emit Transfer(address(0), msg.sender, amount);
+            // Mint tokens to user address
+            uint256 tokensToMint = batchesToMint * oneThousandTokens;
+            _balances[msg.sender] += tokensToMint;
+            _totalSupply += tokensToMint;
+
+            emit Transfer(address(0), msg.sender, tokensToMint);
+
+            batchesPurchased += batchesToMint;
+        }
+
+        // If token batches still need to be purchased (could not be minted)
+        if (batchesPurchased != batchesToPurchase) {
+            uint256 remainingBatchesToPurchase = batchesToPurchase -
+                batchesPurchased;
+            uint256 batchesHeldByContract = _balances[address(this)] /
+                oneThousandTokens;
+            uint256 batchesToSellFromContract;
+
+            if (batchesHeldByContract > 0) {
+                if (batchesHeldByContract >= remainingBatchesToPurchase) {
+                    batchesToSellFromContract = remainingBatchesToPurchase;
+                } else {
+                    batchesToSellFromContract = batchesHeldByContract;
+                }
+
+                // Sell tokens held by contract to user
+                uint256 tokensToSell = batchesToSellFromContract *
+                    oneThousandTokens;
+                _balances[address(this)] -= tokensToSell;
+                _balances[msg.sender] += tokensToSell;
+
+                emit Transfer(address(this), msg.sender, tokensToSell);
+
+                batchesPurchased += batchesToSellFromContract;
+            }
+        }
+
+        // If no tokens were successfully purchased
+        if (batchesPurchased == 0) {
+            revert(
+                "JoshCoinTokensale: Tokensale ended and insufficient tokens held by contract"
+            );
+        }
+
+        // Calculate user change
+        uint256 change = msg.value - (batchesPurchased * 1 ether);
+
+        if (change > 0) {
+            // Send user change
+            address payable userAddress = payable(msg.sender);
+            userAddress.transfer(change);
         }
     }
 }
