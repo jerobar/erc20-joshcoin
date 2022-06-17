@@ -9,9 +9,6 @@ import "./JoshCoinTokensale.sol";
  * @dev 'Token Transfer' implementation of the 'JoshCoin' token.
  */
 contract JoshCoinTokenTransfer is JoshCoinTokensale {
-    uint private oneThousandTokens = 1_000 * 10**18;
-    uint private oneMillionTokens = 1_000_000 * 10**18;
-
     /**
      * @dev Allows users to sell batches of 1,000 tokens for 0.5 ether.
      *
@@ -73,14 +70,11 @@ contract JoshCoinTokenTransfer is JoshCoinTokensale {
             "JoshCoinTokensale: Send at least 1 ether to mint 1,000 tokens"
         );
 
-        uint256 tokensLeftToMint = (oneMillionTokens - (_totalSupply / 10**18));
-
         uint256 batchesToPurchase = msg.value / 1 ether;
         uint256 batchesPurchased;
 
         // If at least one batch of 1,000 tokens can be minted
-        if (tokensLeftToMint >= oneThousandTokens) {
-            uint256 batchesLeftToMint = tokensLeftToMint / oneThousandTokens;
+        if (batchesLeftToMint >= 0) {
             uint256 batchesToMint;
 
             if (batchesLeftToMint >= batchesToPurchase) {

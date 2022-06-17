@@ -12,6 +12,11 @@ import "./JoshCoin.sol";
  * reached. The contract owner may withdraw funds into their own address.
  */
 contract JoshCoinTokensale is JoshCoin {
+    uint internal oneThousandTokens = 1_000 * 10**18;
+    uint internal oneMillionTokens = 1_000_000 * 10**18;
+    uint internal batchesLeftToMint =
+        (oneMillionTokens - _totalSupply) / oneThousandTokens;
+
     /**
      * @dev Withdraws `amount` of contract ether into owner address.
      */
@@ -37,32 +42,28 @@ contract JoshCoinTokensale is JoshCoin {
             "JoshCoinTokensale: Send at least 1 ether to mint 1,000 tokens"
         );
 
-        uint256 tokensLeftToMint = (10**18 *
-            1_000_000 -
-            (_totalSupply / 10**18));
-
         require(
-            (tokensLeftToMint - 1_000 >= 0),
+            (batchesLeftToMint >= 1),
             "JoshCoinTokensale: Token sale has ended"
         );
 
-        uint256 thousandsOfTokensToMint = msg.value / 1 ether;
+        uint256 batchesToMint = msg.value / 1 ether;
 
-        // If requested amount exceeds supply, how many batches of 1,000 can be minted?
-        if ((thousandsOfTokensToMint * 1_000) > tokensLeftToMint) {
-            thousandsOfTokensToMint = tokensLeftToMint / 1_000;
+        // If requested batches exceed supply, mint as many as possible
+        if (batchesToMint > batchesLeftToMint) {
+            batchesToMint = batchesLeftToMint;
         }
 
         // Mint tokens to user address
-        uint256 amount = thousandsOfTokensToMint * (1_000 * 10**18);
+        uint256 amount = batchesToMint * oneThousandTokens;
         _balances[msg.sender] += amount;
         _totalSupply += amount;
 
         emit Transfer(address(0), msg.sender, amount);
 
         // Calculate transaction change
-        uint256 thousandsOfTokensMinted = thousandsOfTokensToMint;
-        uint256 change = msg.value - (thousandsOfTokensMinted * 1 ether);
+        uint256 batchesMinted = batchesToMint;
+        uint256 change = msg.value - (batchesMinted * 1 ether);
 
         if (change > 0) {
             // Send user change
