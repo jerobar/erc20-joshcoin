@@ -118,6 +118,7 @@ contract JoshCoinSanctions is JoshCoin {
         override
         sufficientAllowance(from, to, value)
         sufficientBalance(from, value)
+        notBlacklisted(from)
         notBlacklisted(to)
         returns (bool)
     {
