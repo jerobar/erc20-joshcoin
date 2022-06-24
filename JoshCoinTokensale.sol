@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.7;
 
 // Import standard 'JoshCoin' implementation
 import "./JoshCoin.sol";
@@ -12,17 +12,14 @@ import "./JoshCoin.sol";
  * reached. The contract owner may withdraw funds into their own address.
  */
 contract JoshCoinTokensale is JoshCoin {
-    uint internal oneThousandTokens = 1_000 * 10**18;
-    uint internal oneMillionTokens = 1_000_000 * 10**18;
-    uint internal batchesLeftToMint =
-        (oneMillionTokens - _totalSupply) / oneThousandTokens;
+    uint256 internal oneThousandTokens = 1_000 ether;
+    uint256 internal oneMillionTokens = 1_000_000 ether;
 
     /**
      * @dev Withdraws `amount` of contract ether into owner address.
      */
     function withdraw(uint256 amount) public onlyOwner {
-        address payable ownerAddress = payable(msg.sender);
-        ownerAddress.transfer(amount);
+        payable(msg.sender).transfer(amount);
     }
 
     /**
@@ -41,6 +38,9 @@ contract JoshCoinTokensale is JoshCoin {
             msg.value >= 1 ether,
             "JoshCoinTokensale: Send at least 1 ether to mint 1,000 tokens"
         );
+
+        uint256 batchesLeftToMint = (oneMillionTokens - _totalSupply) /
+            oneThousandTokens;
 
         require(
             (batchesLeftToMint > 0),
@@ -67,8 +67,7 @@ contract JoshCoinTokensale is JoshCoin {
 
         if (change > 0) {
             // Send user change
-            address payable userAddress = payable(msg.sender);
-            userAddress.transfer(change);
+            payable(msg.sender).transfer(change);
         }
     }
 }

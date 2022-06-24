@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.7;
 
 // Import standard 'JoshCoin' implementation
 import "./JoshCoin.sol";
@@ -87,6 +87,7 @@ contract JoshCoinSanctions is JoshCoin {
         public
         override
         sufficientBalance(msg.sender, value)
+        notBlacklisted(msg.sender)
         notBlacklisted(to)
         returns (bool)
     {
